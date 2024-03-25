@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 
-const tictactoe = ["X", "0", "X", "X", "0", "0", "X", "0", "0"];  
+const tictactoe = ["X", "0", "X", "X", "0", "0", "X", "0", "X"];  
 export default function App() {
   return (
     <View style={styles.container}>
