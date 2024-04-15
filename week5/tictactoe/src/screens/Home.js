@@ -85,7 +85,7 @@ export const Home = () => {
         <TButton title="Rules" page='Rules' />
         <TButton 
           title="Save" 
-          disabled={!winner.winner || loadMovements.length > 0} 
+          disabled={!winner.winner || loadMovements?.length > 0} 
           onPress={async ()=>{
             try{
               await saveAlert(movement, winner);
