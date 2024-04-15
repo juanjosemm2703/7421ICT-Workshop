@@ -4,14 +4,30 @@ import { TButton } from '../components/TButton';
 import COLOR from '../constants/color';
 import { Title } from '../components/Title';
 import { useEffect, useState } from 'react';
-import { changePlayer, sortTicTacToe, ticTacToeArray, checkWinner, rearrangeBoard, backWard, forward, checkGameCondition } from '../datamodel/game';
+import { changePlayer, sortTicTacToe, ticTacToeArray, checkWinner, rearrangeBoard, backWard, forward, checkGameCondition, saveGame } from '../datamodel/game';
+import { saveAlert } from '../components/Alert';
+import { useRoute } from '@react-navigation/native';
 
 export const Home = () => {
-  const [tictactoe, setTictactoe] = useState(ticTacToeArray);
+  const route = useRoute();
+  let loadMovements = route.params?.movement;
+  
+  const [tictactoe, setTictactoe] = useState([]);
   const [player, setPlayer] = useState("");
   const [winner, setWinner] = useState("");
-  const [movement, setMovement] = useState([]);
-  console.log(!winner);
+  const [movement, setMovement] = useState( []);
+  
+  useEffect(() => {
+    setTictactoe(ticTacToeArray);
+    setPlayer("X");
+  }, []);
+
+  useEffect(() => {
+    if (loadMovements && loadMovements.length > 0) {
+      setMovement(loadMovements);
+    }
+  }, [loadMovements]);
+
   useEffect(() => {
     const newBoard = sortTicTacToe(tictactoe, movement);
     setTictactoe(newBoard);
@@ -19,7 +35,6 @@ export const Home = () => {
     setWinner(newWinner);
     const newPlayer = changePlayer(player)
     setPlayer(newPlayer);
-    ;
   }, [movement]);
 
   const changeBoard = (index) => {
@@ -28,8 +43,9 @@ export const Home = () => {
   }
 
   const resetBoard = () => {
-    setMovement([]);
+    if(route.params.movement) route.params.movement = [];
     setPlayer("");
+    setMovement([]);
   }
 
   const undoBoard = () => {
@@ -45,26 +61,40 @@ export const Home = () => {
   return (
     <View style={styles.container}>
       <Title title="Tic Tac Toe" />
+      
       {
         <View style={styles.buttonContainer}>
 
           <TButton title="<"
-            disabled={!checkGameCondition(movement).backWard} backgroundColor={!checkGameCondition(movement).backWard ? COLOR.DARKGRAY : undefined}
+            disabled={!checkGameCondition(movement).backWard}
             onPress={undoBoard} />
 
           <TButton title="New Game"
-            disabled={!checkGameCondition(movement).reset} backgroundColor={!checkGameCondition(movement).reset ? COLOR.DARKGRAY : undefined}
+            disabled={!checkGameCondition(movement).reset} 
             onPress={resetBoard} />
 
           <TButton title=">"
-            disabled={!checkGameCondition(movement).forward} backgroundColor={!checkGameCondition(movement).forward ? COLOR.DARKGRAY : undefined}
+            disabled={!checkGameCondition(movement).forward} 
             onPress={redoBoard} />
 
         </View>
       }
-      <Board tictactoe={tictactoe} onPress={changeBoard} />
+      <Title color={COLOR.BLACK} title={!winner ? `${player} to play` :  winner.winner != 'Tie' ? `${winner.winner} wins` : 'Tie'} />
+      <Board tictactoe={tictactoe} onPress={changeBoard} winnerMovements = {winner?.winnerMovements}/>
       <View style={styles.buttonContainer}>
         <TButton title="Rules" page='Rules' />
+        <TButton 
+          title="Save" 
+          disabled={!winner.winner || loadMovements?.length > 0} 
+          onPress={async ()=>{
+            try{
+              await saveAlert(movement, winner);
+              resetBoard();
+            }catch(e){
+              console.log(e);
+            }
+          }} />
+        <TButton title="Load" page='Load' />
         <TButton title="Credits" page='Credits' />
       </View>
     </View>
@@ -80,6 +110,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around',
   },
+
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
