@@ -10,8 +10,8 @@ import { useRoute } from '@react-navigation/native';
 
 export const Home = () => {
   const route = useRoute();
-  let loadMovements = route.params?.movement;
-  
+  let loadMovements = route.params ? route.params.movement : [];
+
   const [tictactoe, setTictactoe] = useState([]);
   const [player, setPlayer] = useState("");
   const [winner, setWinner] = useState("");
@@ -25,6 +25,7 @@ export const Home = () => {
   useEffect(() => {
     if (loadMovements && loadMovements.length > 0) {
       setMovement(loadMovements);
+      console.log("Home Screen2222");
     }
   }, [loadMovements]);
 
@@ -43,7 +44,7 @@ export const Home = () => {
   }
 
   const resetBoard = () => {
-    if(route.params.movement) route.params.movement = [];
+    if(route.params) route.params.movement = [];
     setPlayer("");
     setMovement([]);
   }
@@ -85,7 +86,7 @@ export const Home = () => {
         <TButton title="Rules" page='Rules' />
         <TButton 
           title="Save" 
-          disabled={!winner.winner || loadMovements?.length > 0} 
+          disabled={!winner.winner || loadMovements > 0} 
           onPress={async ()=>{
             try{
               await saveAlert(movement, winner);
