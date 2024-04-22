@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "tictactoe",
-    "slug": "tictactoe",
+    "name": "show-image",
+    "slug": "show-image",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
